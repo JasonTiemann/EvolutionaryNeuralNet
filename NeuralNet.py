@@ -4,18 +4,17 @@ class node:
 	
 	def __init__(self):
 		self.value = 0
-		self.weight=random.uniform(-2,2)
+		self.weight=random.uniform(-1,1)
 	def clear(self):
 		self.value=0
 	def activate(self):
-		return self.value + self.weight;
+		return max(0,min(1,self.value + self.weight));
 	def add(self,addAmount):
 		self.value+=addAmount
 	def setWeight(self,changeAmt):
 		self.weight+=changeAmt
 	def mutate(self):
-		if(random.random()>.5):
-			self.weight+=random.uniform(-.5,.5)
+		self.weight+=random.uniform(-.5,.5)
 
 class nodeRow:
 	def __init__(self,length):
@@ -66,8 +65,7 @@ class connectionRow:
 		self.weightList=newWeightList
 	def mutate(self):
 		for i in range(len(self.weightList)):
-			if random.random()>.5:
-				self.weightList[i]+=random.uniform(-.5,.5)
+			self.weightList[i]+=random.uniform(-1,1)
 	def getLen(self):
 		return len(self.weightList)
 	def combine(self,secondConnection):
@@ -104,8 +102,8 @@ class net:
 				for connectNum in range(self.connectors[nodeLayer][0].getLen()):
 					tempOutput.append(currentInput[node]*self.connectors[nodeLayer][node].getWeight(connectNum))
 				self.nodeRows[nodeLayer+1].add(tempOutput)
-			currentInput=self.nodeRows[nodeLayer].activate()
-			self.nodeRows[node].clear()
+			currentInput=self.nodeRows[nodeLayer+1].activate()
+			self.nodeRows[nodeLayer+1].clear()
 		return currentInput
 
 	def mutate(self):
@@ -114,6 +112,7 @@ class net:
 		for fromConnect in range(len(self.connectors)):
 			for toConnect in range(len(self.connectors[fromConnect])):
 				self.connectors[fromConnect][toConnect].mutate()
+		return self
 	def setConnectors(self,connectionList):
 		self.connectors = connectionList
 	def setNodeRows(self,nodeRows):
